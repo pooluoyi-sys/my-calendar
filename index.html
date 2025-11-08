@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万年历 - GitHub 主页</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- 引入农历库 -->
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.11/lunar.min.js"></script>
+</head>
+<body>
+    <div class="calendar-container">
+        <!-- 头部控制区域 -->
+        <header class="calendar-header">
+            <button id="prevMonth" class="nav-btn">‹</button>
+            <div class="date-info">
+                <select id="yearSelect"></select>
+                <span>年</span>
+                <select id="monthSelect">
+                    <option value="0">1月</option>
+                    <option value="1">2月</option>
+                    <option value="2">3月</option>
+                    <option value="3">4月</option>
+                    <option value="4">5月</option>
+                    <option value="5">6月</option>
+                    <option value="6">7月</option>
+                    <option value="7">8月</option>
+                    <option value="8">9月</option>
+                    <option value="9">10月</option>
+                    <option value="10">11月</option>
+                    <option value="11">12月</option>
+                </select>
+                <button id="todayBtn" class="today-btn">今天</button>
+            </div>
+            <button id="nextMonth" class="nav-btn">›</button>
+        </header>
+
+        <!-- 星期标题 -->
+        <div class="weekdays">
+            <div class="weekday">日</div>
+            <div class="weekday">一</div>
+            <div class="weekday">二</div>
+            <div class="weekday">三</div>
+            <div class="weekday">四</div>
+            <div class="weekday">五</div>
+            <div class="weekday">六</div>
+        </div>
+
+        <!-- 日期网格 -->
+        <div id="calendarGrid" class="calendar-grid"></div>
+
+        <!-- 底部信息 -->
+        <footer class="calendar-footer">
+            <div id="todayInfo" class="today-info"></div>
+            <div class="github-link">
+                <a href="https://github.com/你的用户名/你的仓库名" target="_blank">
+                    📦 查看源码
+                </a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        class Calendar {
+            constructor() {
+                this.currentDate = new Date();
+                this.today = new Date();
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+                this.generateYearOptions();
+                this.render();
+                this.updateTodayInfo();
+            }
+
+            bindEvents() {
+                // 月份切换
+                document.getElementById('prevMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                    this.render();
+                });
+
+                document.getElementById('nextMonth').addEventListener('click', () => {
+                    this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                    this.render();
+                });
+
+                // 年份选择
+                document.getElementById('yearSelect').addEventListener('change', (e) => {
+                    this.currentDate.setFullYear(parseInt(e.target.value));
+                    this.render();
+                });
+
+                // 月份选择
+                document.getElementById('monthSelect').addEventListener('change', (e) => {
+                    this.currentDate.setMonth(parseInt(e.target.value));
+                    this.render();
+                });
+
+                // 今天按钮
+                document.getElementById('todayBtn').addEventListener('click', () => {
+                    this.currentDate = new Date(this.today);
+                    this.render();
+                });
+            }
+
+            generateYearOptions() {
+                const yearSelect = document.getElementById('yearSelect');
+                const currentYear = this.today.getFullYear();
+                
+                // 生成年份选项（1900-2100）
+                for (let year = 1900; year <= 2100; year++) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    if (year === currentYear) {
+                        option.selected = true;
+                    }
+                    yearSelect.appendChild(option);
+                }
+            }
+
+            render() {
+                this.updateControls();
+                this.generateCalendar();
+            }
+
+            updateControls() {
+                // 更新年份选择器
+                document.getElementById('yearSelect').value = this.currentDate.getFullYear();
+                // 更新月份选择器
+                document.getElementById('monthSelect').value = this.currentDate.getMonth();
+            }
+
+            generateCalendar() {
+                const grid = document.getElementById('calendarGrid');
+                grid.innerHTML = '';
+
+                const year = this.currentDate.getFullYear();
+                const month = this.currentDate.getMonth();
+                
+                // 获取当月第一天和最后一天
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                
+                // 获取第一天是星期几（0=周日）
+                const startDay = firstDay.getDay();
+                // 获取当月有多少天
+                const daysInMonth = lastDay.getDate();
+
+                // 生成空白格子（上个月的日期）
+                for (let i = 0; i < startDay; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'day-cell empty';
+                    grid.appendChild(emptyDay);
+                }
+
+                // 生成当月日期
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayCell = document.createElement('div');
+                    dayCell.className = 'day-cell';
+                    
+                    const solarDate = document.createElement('div');
+                    solarDate.className = 'solar-date';
+                    solarDate.textContent = day;
+                    
+                    // 农历日期
+                    const lunarDate = document.createElement('div');
+                    lunarDate.className = 'lunar-date';
+                    const lunar = Lunar.fromDate(new Date(year, month, day));
+                    lunarDate.textContent = this.formatLunarDay(lunar.getDay());
+                    
+                    dayCell.appendChild(solarDate);
+                    dayCell.appendChild(lunarDate);
+
+                    // 判断是否为今天
+                    if (this.isToday(year, month, day)) {
+                        dayCell.classList.add('today');
+                    }
+
+                    // 判断是否为周末
+                    const currentDayOfWeek = new Date(year, month, day).getDay();
+                    if (currentDayOfWeek === 0 || currentDayOfWeek === 6) {
+                        dayCell.classList.add('weekend');
+                    }
+
+                    // 节假日判断
+                    const holiday = this.getHoliday(month + 1, day);
+                    if (holiday) {
+                        dayCell.classList.add('holiday');
+                        const holidayTag = document.createElement('div');
+                        holidayTag.className = 'holiday-tag';
+                        holidayTag.textContent = holiday;
+                        dayCell.appendChild(holidayTag);
+                    }
+
+                    grid.appendChild(dayCell);
+                }
+
+                // 填充剩余格子
+                const totalCells = grid.children.length;
+                const remainingCells = 42 - totalCells;
+                for (let i = 0; i < remainingCells; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'day-cell empty';
+                    grid.appendChild(emptyDay);
+                }
+            }
+
+            formatLunarDay(day) {
+                const lunarDays = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+                                  '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+                                  '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
+                return lunarDays[day - 1] || '';
+            }
+
+            isToday(year, month, day) {
+                return year === this.today.getFullYear() &&
+                       month === this.today.getMonth() &&
+                       day === this.today.getDate();
+            }
+
+            getHoliday(month, day) {
+                const holidays = {
+                    '1-1': '元旦', '2-14': '情人节', '3-8': '妇女节', '4-1': '愚人节',
+                    '5-1': '劳动节', '6-1': '儿童节', '7-1': '建党节', '8-1': '建军节',
+                    '9-10': '教师节', '10-1': '国庆节', '12-25': '圣诞节'
+                };
+                return holidays[`${month}-${day}`];
+            }
+
+            updateTodayInfo() {
+                const todayInfo = document.getElementById('todayInfo');
+                const lunar = Lunar.fromDate(this.today);
+                
+                const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+                const weekDay = weekDays[this.today.getDay()];
+                
+                todayInfo.innerHTML = `
+                    <strong>今天：</strong>
+                    ${this.today.getFullYear()}年${this.today.getMonth() + 1}月${this.today.getDate()}日 
+                    星期${weekDay} 
+                    | 农历${lunar.getMonthInChinese()}月${this.formatLunarDay(lunar.getDay())}
+                `;
+            }
+        }
+
+        // 初始化日历
+        document.addEventListener('DOMContentLoaded', () => {
+            new Calendar();
+        });
+    </script>
+</body>
+</html>

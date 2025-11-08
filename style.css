@@ -1,0 +1,263 @@
+/* style.css - 万年历样式 */
+
+:root {
+    --primary-color: #4e73df;
+    --primary-hover: #2e59d9;
+    --bg-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --glass-bg: rgba(255, 255, 255, 0.25);
+    --glass-border: rgba(255, 255, 255, 0.18);
+    --text-color: #333;
+    --shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+    background: var(--bg-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.calendar-container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow);
+    width: 100%;
+    max-width: 800px;
+    padding: 30px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-btn {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    font-size: 24px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    font-weight: bold;
+}
+
+.nav-btn:hover {
+    background: var(--primary-color);
+    transform: scale(1.1);
+}
+
+.date-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+}
+
+#yearSelect, #monthSelect {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+}
+
+#yearSelect option, #monthSelect option {
+    background: #4e73df;
+    color: white;
+}
+
+.today-btn {
+    padding: 8px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.today-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 8px;
+    background: var(--glass-bg);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+.day-cell {
+    aspect-ratio: 1;
+    background: var(--glass-bg);
+    border-radius: 12px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid var(--glass-border);
+}
+
+.day-cell:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.day-cell.empty {
+    background: transparent;
+    cursor: default;
+}
+
+.day-cell.empty:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.solar-date {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.lunar-date {
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.6);
+    margin-top: 2px;
+}
+
+.weekend .solar-date {
+    color: #ff6b6b;
+}
+
+.today {
+    background: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(78, 115, 223, 0.4);
+}
+
+.today .solar-date {
+    color: white;
+    font-weight: 700;
+}
+
+.today .lunar-date {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.holiday-tag {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: #ff6b6b;
+    color: white;
+    font-size: 9px;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.calendar-footer {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.today-info {
+    color: white;
+    font-size: 14px;
+}
+
+.github-link a {
+    color: white;
+    text-decoration: none;
+    background: var(--glass-bg);
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.github-link a:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+    .calendar-container {
+        padding: 15px;
+    }
+    
+    .nav-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
+    }
+    
+    .date-info {
+        font-size: 14px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .solar-date {
+        font-size: 14px;
+    }
+    
+    .lunar-date {
+        font-size: 9px;
+    }
+    
+    .calendar-footer {
+        flex-direction: column;
+        text-align: center;
+    }
+}
